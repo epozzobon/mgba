@@ -440,6 +440,7 @@ void mCoreConfigMap(const struct mCoreConfig* config, struct mCoreOptions* opts)
 	_lookupCharValue(config, "screenshotPath", &opts->screenshotPath);
 	_lookupCharValue(config, "patchPath", &opts->patchPath);
 	_lookupCharValue(config, "cheatsPath", &opts->cheatsPath);
+	_lookupCharValue(config, "uart", &opts->uartDevice);
 }
 
 void mCoreConfigLoadDefaults(struct mCoreConfig* config, const struct mCoreOptions* opts) {
@@ -465,6 +466,7 @@ void mCoreConfigLoadDefaults(struct mCoreConfig* config, const struct mCoreOptio
 	ConfigurationSetIntValue(&config->defaultsTable, 0, "lockIntegerScaling", opts->lockIntegerScaling);
 	ConfigurationSetIntValue(&config->defaultsTable, 0, "resampleVideo", opts->resampleVideo);
 	ConfigurationSetIntValue(&config->defaultsTable, 0, "suspendScreensaver", opts->suspendScreensaver);
+	ConfigurationSetValue(&config->defaultsTable, 0, "uart", opts->uartDevice);
 }
 
 static void _configEnum(const char* key, const char* value, void* user) {
@@ -504,6 +506,7 @@ void mCoreConfigFreeOpts(struct mCoreOptions* opts) {
 	free(opts->screenshotPath);
 	free(opts->patchPath);
 	free(opts->cheatsPath);
+	free(opts->uartDevice);
 	opts->bios = 0;
 	opts->shader = 0;
 	opts->savegamePath = 0;
@@ -511,4 +514,5 @@ void mCoreConfigFreeOpts(struct mCoreOptions* opts) {
 	opts->screenshotPath = 0;
 	opts->patchPath = 0;
 	opts->cheatsPath = 0;
+	opts->uartDevice = 0;
 }

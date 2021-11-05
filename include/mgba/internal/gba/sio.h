@@ -59,6 +59,7 @@ struct GBASIODriverSet {
 	struct GBASIODriver* normal;
 	struct GBASIODriver* multiplayer;
 	struct GBASIODriver* joybus;
+	struct GBASIODriver* uart;
 };
 
 struct GBASIO {
@@ -84,6 +85,7 @@ void GBASIOSetDriver(struct GBASIO* sio, struct GBASIODriver* driver, enum GBASI
 void GBASIOWriteRCNT(struct GBASIO* sio, uint16_t value);
 void GBASIOWriteSIOCNT(struct GBASIO* sio, uint16_t value);
 uint16_t GBASIOWriteRegister(struct GBASIO* sio, uint32_t address, uint16_t value);
+uint16_t GBASIOReadRegister(struct GBASIO* sio, uint32_t address);
 
 int GBASIOJOYSendCommand(struct GBASIODriver* sio, enum GBASIOJOYCommand command, uint8_t* data);
 

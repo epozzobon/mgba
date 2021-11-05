@@ -45,6 +45,14 @@ CoreController::CoreController(mCore* core, QObject* parent)
 #ifdef M_CORE_GBA
 	GBASIODolphinCreate(&m_dolphin);
 #endif
+#ifdef M_CORE_GBA
+	if (m_threadContext.core->opts.uartDevice) {
+		GBASIOUARTCreate(&m_uart);
+		GBA* gba = static_cast<GBA*>(m_threadContext.core->board);
+		GBASIOSetDriver(&gba->sio, &m_uart.d, SIO_UART);
+		GBASIOUARTConnect(&m_uart, m_threadContext.core->opts.uartDevice);
+	}
+#endif
 
 	m_resetActions.append([this]() {
 		if (m_autoload) {

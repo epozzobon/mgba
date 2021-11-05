@@ -38,6 +38,7 @@ static const struct option _options[] = {
 	{ "gdb",       no_argument, 0, 'g' },
 #endif
 	{ "help",      no_argument, 0, 'h' },
+	{ "uart",      no_argument, 0, 'u' },
 	{ "log-level", required_argument, 0, 'l' },
 	{ "savestate", required_argument, 0, 't' },
 	{ "patch",     required_argument, 0, 'p' },
@@ -68,7 +69,7 @@ static void _tableApply(const char* key, void* value, void* user) {
 bool parseArguments(struct mArguments* args, int argc, char* const* argv, struct mSubParser* subparser) {
 	int ch;
 	char options[64] =
-		"b:c:C:hl:p:s:t:"
+		"b:c:C:hl:p:s:t:u:"
 #ifdef USE_EDITLINE
 		"d"
 #endif
@@ -79,6 +80,7 @@ bool parseArguments(struct mArguments* args, int argc, char* const* argv, struct
 	memset(args, 0, sizeof(*args));
 	args->frameskip = -1;
 	args->logLevel = INT_MIN;
+	args->uartDevice = 0;
 	HashTableInit(&args->configOverrides, 0, free);
 	if (subparser && subparser->extraOptions) {
 		// TODO: modularize options to subparsers
@@ -100,6 +102,9 @@ bool parseArguments(struct mArguments* args, int argc, char* const* argv, struct
 			break;
 		case 'c':
 			args->cheatsFile = strdup(optarg);
+			break;
+		case 'u':
+			args->uartDevice = strdup(optarg);
 			break;
 		case 'C':
 			_tableInsert(&args->configOverrides, optarg);
@@ -166,6 +171,9 @@ void applyArguments(const struct mArguments* args, struct mSubParser* subparser,
 	if (args->bios) {
 		mCoreConfigSetOverrideValue(config, "bios", args->bios);
 	}
+	if (args->uartDevice) {
+		mCoreConfigSetOverrideValue(config, "uart", args->uartDevice);
+	}
 	HashTableEnumerate(&args->configOverrides, _tableApply, config);
 	if (subparser) {
 		subparser->apply(subparser, config);
@@ -184,6 +192,9 @@ void freeArguments(struct mArguments* args) {
 
 	free(args->cheatsFile);
 	args->cheatsFile = 0;
+
+	free(args->uartDevice);
+	args->uartDevice = 0;
 
 	free(args->bios);
 	args->bios = 0;
@@ -247,6 +258,7 @@ void usage(const char* arg0, const char* extraOptions) {
 	puts("  -t, --savestate FILE       Load savestate when starting");
 	puts("  -p, --patch FILE           Apply a specified patch file when running");
 	puts("  -s, --frameskip N          Skip every N frames");
+	puts("  -u, --uart DEVICE          Connect DEVICE to the emulated uart");
 	puts("  --version                  Print version and exit");
 	if (extraOptions) {
 		puts(extraOptions);

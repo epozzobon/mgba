@@ -27,6 +27,7 @@
 #endif
 #ifdef M_CORE_GBA
 #include <mgba/internal/gba/sio/dolphin.h>
+#include <mgba/internal/gba/sio/uart.h>
 #endif
 
 #ifdef M_CORE_GBA
@@ -285,6 +286,7 @@ private:
 	MultiplayerController* m_multiplayer = nullptr;
 #ifdef M_CORE_GBA
 	GBASIODolphin m_dolphin;
+	GBASIOUART m_uart;
 #endif
 
 	mVideoLogContext* m_vl = nullptr;

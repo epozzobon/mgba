@@ -27,6 +27,8 @@ static struct GBASIODriver* _lookupDriver(struct GBASIO* sio, enum GBASIOMode mo
 		return sio->drivers.multiplayer;
 	case SIO_JOYBUS:
 		return sio->drivers.joybus;
+	case SIO_UART:
+		return sio->drivers.uart;
 	default:
 		return 0;
 	}
@@ -44,6 +46,8 @@ static const char* _modeName(enum GBASIOMode mode) {
 		return "JOYBUS";
 	case SIO_GPIO:
 		return "GPIO";
+	case SIO_UART:
+		return "UART";
 	default:
 		return "(unknown)";
 	}
@@ -116,6 +120,7 @@ void GBASIOSetDriverSet(struct GBASIO* sio, struct GBASIODriverSet* drivers) {
 	GBASIOSetDriver(sio, drivers->normal, SIO_NORMAL_8);
 	GBASIOSetDriver(sio, drivers->multiplayer, SIO_MULTI);
 	GBASIOSetDriver(sio, drivers->joybus, SIO_JOYBUS);
+	GBASIOSetDriver(sio, drivers->joybus, SIO_UART);
 }
 
 void GBASIOSetDriver(struct GBASIO* sio, struct GBASIODriver* driver, enum GBASIOMode mode) {
@@ -130,6 +135,9 @@ void GBASIOSetDriver(struct GBASIO* sio, struct GBASIODriver* driver, enum GBASI
 		break;
 	case SIO_JOYBUS:
 		driverLoc = &sio->drivers.joybus;
+		break;
+	case SIO_UART:
+		driverLoc = &sio->drivers.uart;
 		break;
 	default:
 		mLOG(GBA_SIO, ERROR, "Setting an unsupported SIO driver: %x", mode);
@@ -184,6 +192,7 @@ void GBASIOWriteSIOCNT(struct GBASIO* sio, uint16_t value) {
 		switch (sio->mode) {
 		case SIO_NORMAL_8:
 		case SIO_NORMAL_32:
+		case SIO_UART:
 			value |= 0x0004;
 			if ((value & 0x0081) == 0x0081) {
 				if (value & 0x4000) {
@@ -203,6 +212,14 @@ void GBASIOWriteSIOCNT(struct GBASIO* sio, uint16_t value) {
 		}
 	}
 	sio->siocnt = value;
+}
+
+uint16_t GBASIOReadRegister(struct GBASIO* sio, uint32_t address) {
+	if (sio->activeDriver && sio->activeDriver->readRegister) {
+		return sio->activeDriver->readRegister(sio->activeDriver, address);
+	} else {
+		return sio->p->memory.io[address >> 1];
+	}
 }
 
 uint16_t GBASIOWriteRegister(struct GBASIO* sio, uint32_t address, uint16_t value) {

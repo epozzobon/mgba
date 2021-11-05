@@ -20,6 +20,7 @@ struct mArguments {
 	char* cheatsFile;
 	char* savestate;
 	char* bios;
+	char* uartDevice;
 	int logLevel;
 	int frameskip;
 

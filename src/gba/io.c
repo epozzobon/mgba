@@ -761,11 +761,6 @@ uint16_t GBAIORead(struct GBA* gba, uint32_t address) {
 			gba->memory.io[address >> 1] = 0x3FF ^ input;
 		}
 		break;
-	case REG_SIOCNT:
-		return gba->sio.siocnt;
-	case REG_RCNT:
-		return gba->sio.rcnt;
-
 	case REG_BG0HOFS:
 	case REG_BG0VOFS:
 	case REG_BG1HOFS:
@@ -899,6 +894,13 @@ uint16_t GBAIORead(struct GBA* gba, uint32_t address) {
 	case REG_TM2CNT_HI:
 	case REG_TM3CNT_HI:
 	case REG_KEYCNT:
+	case REG_IE:
+	case REG_IF:
+	case REG_WAITCNT:
+	case REG_IME:
+		// Handled transparently by registers
+		break;
+
 	case REG_SIOMULTI0:
 	case REG_SIOMULTI1:
 	case REG_SIOMULTI2:
@@ -908,12 +910,16 @@ uint16_t GBAIORead(struct GBA* gba, uint32_t address) {
 	case REG_JOY_TRANS_LO:
 	case REG_JOY_TRANS_HI:
 	case REG_JOYSTAT:
-	case REG_IE:
-	case REG_IF:
-	case REG_WAITCNT:
-	case REG_IME:
-		// Handled transparently by registers
-		break;
+		return GBASIOReadRegister(&gba->sio, address);
+	case REG_SIOCNT:
+		{
+			uint16_t value = gba->sio.siocnt;
+			gba->sio.siocnt &= ~(1 << 6);  // Reset error bit
+			return value;
+		}
+	case REG_RCNT:
+		return gba->sio.rcnt;
+
 	case 0x066:
 	case 0x06E:
 	case 0x076:

@@ -52,6 +52,7 @@ struct mCoreOptions {
 	char* screenshotPath;
 	char* patchPath;
 	char* cheatsPath;
+	char* uartDevice;
 
 	int volume;
 	bool mute;

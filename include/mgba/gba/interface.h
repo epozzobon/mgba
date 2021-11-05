@@ -76,6 +76,7 @@ struct GBASIODriver {
 	bool (*load)(struct GBASIODriver* driver);
 	bool (*unload)(struct GBASIODriver* driver);
 	uint16_t (*writeRegister)(struct GBASIODriver* driver, uint32_t address, uint16_t value);
+	uint16_t (*readRegister)(struct GBASIODriver* driver, uint32_t address);
 };
 
 void GBASIOJOYCreate(struct GBASIODriver* sio);
